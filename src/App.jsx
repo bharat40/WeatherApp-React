@@ -2,21 +2,24 @@ import React, { useState } from "react";
 import axios from "axios";
 
 function App() {
-  const API_KEY = "59d9bbb66248e6f0747980ef6479e0bb";
   const [city, setCity] = useState("");
   const [weather, setWeather] = useState(null);
   const [error, setError] = useState("");
-
+  const [loading, setLoading] = useState(false);
+  const API_KEY = import.meta.env.VITE_API_KEY;
   const handleSubmit = async (e) => {
+    setLoading(true);
     e.preventDefault();
     try {
       const res = await axios.get(
         `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`
       );
       setWeather(res.data);
+      setLoading(false);
       setError("");
       console.log(res.data);
     } catch (err) {
+      setLoading(false);
       setWeather(null);
       setError("City not found or API error.");
       console.error(err);
@@ -44,7 +47,11 @@ function App() {
       </form>
 
       {error && <p className="text-red-600 mb-4">{error}</p>}
-
+      {loading && (
+        <div>
+          <span className="text-gray-300">Loading...</span>
+        </div>
+      )}
       {weather && (
         <div className=" p-6 rounded-lg bg-gray-400 shadow-md text-center w-80">
           <h2 className="text-xl font-semibold">{weather.name}</h2>
